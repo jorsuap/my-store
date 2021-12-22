@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { switchMap, zip } from 'rxjs';
 import { Product, CreateProductDTO,UpdateProductDTO } from 'src/app/models/product.model';
 import { StoreService } from 'src/app/services/store.service';
 import { ProductsService } from 'src/app/services/products.service';
+
 
 
 @Component({
@@ -28,7 +30,9 @@ export class ProductsComponent implements OnInit {
   }
 
   limit = 10;
-  offset = 0
+  offset = 0;
+
+  statusDetail: 'loading' | 'success' | 'error' | 'init' = 'init';
 
   constructor(
     private storeService:StoreService, //inyectando el servicio para ser usado en un componente
@@ -38,6 +42,10 @@ export class ProductsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadData()
+  }
+
+  public loadData(){
     this.productsService.getAllProducts(this.limit,this.offset)// debemos suscribirnos para ontener los cambios async
     .subscribe(data =>{// es un evento asincrono por lo que se debe suscribir a los cambios, cuando llege los datos, los asignara
       this.products = data;
@@ -50,15 +58,25 @@ export class ProductsComponent implements OnInit {
   }
 
   toggleProductDetail(){
-    this.showProductDetail = !this.showProductDetail;
+     this.showProductDetail = true;
+  }
+  close(){
+    this.showProductDetail = false
   }
 
   onShowDetail(id:string){
+    this.statusDetail = 'loading';
+    this.toggleProductDetail();
     this.productsService.getProduct(id)
     .subscribe(data=>{
       this.toggleProductDetail();
       console.log('product', data);
       this.productChosen = data;
+      this.statusDetail = 'success';
+    }, errorMessage =>{
+      window.alert(errorMessage)
+      console.error(errorMessage);
+      this.statusDetail = 'error';
     })
   }
 
@@ -106,4 +124,32 @@ export class ProductsComponent implements OnInit {
       this.offset += this.limit
     })
   }
+
+
+  readandUpdate(id: string){
+    //evitando callback hell usando switchMap
+    //de estqa forma no se anidan peticciones que dependen de las otras
+    this.productsService.getProduct(id)
+    .pipe(
+      switchMap((product)=>{
+        return this.productsService.update(product.id,{title:'change'})
+      })
+    )
+    .subscribe(data =>{
+        console.log(data)
+    })
+    // usando zip se responden todas las promesas al mismo tiempo
+    //se recomienda hacerlo en el servicio
+    zip(
+      this.productsService.getProduct(id),
+      this.productsService.update(id,{title:'nuevo'})
+    )
+    .subscribe(response =>{
+      const read = response [0];
+      const update = response [1];
+    })
+
+  }
+
+
 }
