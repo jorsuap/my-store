@@ -5,7 +5,8 @@ import { UsersService } from 'src/app/services/users/users.service';
 import { User } from 'src/app/models/user.model';
 import { switchMap} from 'rxjs/operators';
 import { Auth } from 'src/app/models/auth.model';
-
+import { CategoriesService } from 'src/app/services/categories/categories.service';
+import { Category } from 'src/app/models/product.model';
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
@@ -16,17 +17,19 @@ export class NavComponent implements OnInit {
   activeMenu = false;
   counter = 0;
   currentProfile: User | null = null;
+  categories: Category[] = [];
 
   constructor(
     private storeService:StoreService,
     private authService: AuthService,
-    private usersService: UsersService
+    private categoriesService:CategoriesService
   ) { }
 
   ngOnInit(): void {
     this.storeService.myCart$.subscribe(products =>{
       this.counter = products.length;
     });
+    this.getAllCategories()
   }
 
   toggleMenu(){
@@ -55,4 +58,11 @@ export class NavComponent implements OnInit {
   //     switchMap(()=> this.getProfile())
   //   )
   // }
+
+  getAllCategories(){
+    this.categoriesService.getAll()
+    .subscribe(data => {
+      this.categories = data
+    })
+  }
 }

@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { Product } from './models/product.model';
-import { AuthService } from './services/auth/auth.service';
 import { UsersService } from './services/users/users.service';
 import { FilesService } from './services/files/files.service';
 @Component({
@@ -14,7 +12,6 @@ export class AppComponent {
   imgRta = '';
 
   constructor(
-    private authService :AuthService,
     private userService: UsersService,
     private filesService:FilesService
   ){}
@@ -31,7 +28,7 @@ export class AppComponent {
   }
 
   downLoadPDF(){
-    this.filesService.getFile('my.pdf', 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf', 'applications/pdf')
+    this.filesService.getFile('my.pdf', 'https://young-sands-07814.herokuapp.com/api/files/dummy.pdf', 'applications/pdf')
     .subscribe(
     )
   }

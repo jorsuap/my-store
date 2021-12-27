@@ -1,8 +1,10 @@
-
-<img *ngIf="product.images.length > 0" [src]="product.images[0]" alt="" width="200">
+<a [routerLink]="['/product',product.id]">
+  <img *ngIf="product.images.length > 0" [src]="product.images[0]" alt="" width="200">
+</a>
 <p>{{product.title}}</p>
-<h2>{{product.price | currency:'COP'}}</h2>
+<h2 class="price">{{product.price | currency:'COP'}}</h2>
 <h2>{{product?.taxes | currency:'COP'}}</h2>
-<p appHighLight>{{product.description}}</p>
+<p appHighLight *ngIf="showDescription">{{product.description }}</p>
 <button (click)="onAddtoCart()">Add cart</button>
-<button (click)="onShowDetail()">Detail</button>
+<a routerLink='.' [queryParams]="{product:product.id}">Ver detalle</a>
+<!-- <button (click)="onShowDetail()">Detail</button> -->

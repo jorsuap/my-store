@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output } from '@angular/core';
 import { switchMap, zip } from 'rxjs';
 import { Product, CreateProductDTO,UpdateProductDTO } from 'src/app/models/product.model';
 import { StoreService } from 'src/app/services/store.service';
 import { ProductsService } from 'src/app/services/products.service';
-
+import { EventEmitter } from '@angular/core';
 
 
 @Component({
@@ -13,9 +13,18 @@ import { ProductsService } from 'src/app/services/products.service';
 })
 export class ProductsComponent implements OnInit {
 
+  @Input() products :Product[] = [];
+
+  @Input()
+  set productId(id: string | null) {
+    if(id){
+      this.onShowDetail(id)
+    }
+  };
+  @Output() loadMoreEvent = new EventEmitter();
+
   myShoppingCart:Product[] = [];
   total = 0;
-  products :Product[] = [];
   showProductDetail = false;
   productChosen:Product = {
     id: '',
@@ -26,11 +35,12 @@ export class ProductsComponent implements OnInit {
     category: {
       id: '',
       name: ''
-    }
+    },
+    taxes:0
   }
 
-  limit = 10;
-  offset = 0;
+  // limit = 10;
+  // offset = 0;
 
   statusDetail: 'loading' | 'success' | 'error' | 'init' = 'init';
 
@@ -41,16 +51,17 @@ export class ProductsComponent implements OnInit {
     this.myShoppingCart = this.storeService.getShoppingCart();
   }
 
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit(): void {
-    this.loadData()
+    // this.loadData()
   }
 
-  public loadData(){
-    this.productsService.getAllProducts(this.limit,this.offset)// debemos suscribirnos para ontener los cambios async
-    .subscribe(data =>{// es un evento asincrono por lo que se debe suscribir a los cambios, cuando llege los datos, los asignara
-      this.products = data;
-    })
-  }
+  // public loadData(){
+  //   this.productsService.getAllProducts(this.limit,this.offset)// debemos suscribirnos para ontener los cambios async
+  //   .subscribe(data =>{// es un evento asincrono por lo que se debe suscribir a los cambios, cuando llege los datos, los asignara
+  //     this.products = data;
+  //   })
+  // }
 
   onAddToShoppingCart(product:Product){
      this.storeService.addProduct(product);
@@ -65,8 +76,11 @@ export class ProductsComponent implements OnInit {
   }
 
   onShowDetail(id:string){
+
     this.statusDetail = 'loading';
-    this.toggleProductDetail();
+    if(!this.showProductDetail){
+      this.showProductDetail = true;
+    }
     this.productsService.getProduct(id)
     .subscribe(data=>{
       this.toggleProductDetail();
@@ -117,13 +131,7 @@ export class ProductsComponent implements OnInit {
     })
   }
 
-  loadMore(){
-    this.productsService.getProductsByPage(this.limit,this.offset)// debemos suscribirnos para ontener los cambios async
-    .subscribe(data =>{// es un evento asincrono por lo que se debe suscribir a los cambios, cuando llege los datos, los asignara
-      this.products = this.products.concat(data);
-      this.offset += this.limit
-    })
-  }
+
 
 
   readandUpdate(id: string){
@@ -150,6 +158,8 @@ export class ProductsComponent implements OnInit {
     })
 
   }
-
+  loadMore(){
+    this.loadMoreEvent.emit()
+  }
 
 }

@@ -16,6 +16,16 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from "@angular/common";
 import { TimeInterceptor } from './interceptor/time.interceptor';
 import { TokenInterceptor } from './interceptor/token/token.interceptor';
+import { HomeComponent } from './pages/home/home.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { CategoryComponent } from './pages/category/category.component';
+import { MycartComponent } from './pages/mycart/mycart.component';
+import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
+import { RecoveryComponent } from './pages/recovery/recovery.component';
+import { ProfileComponent } from './pages/profile/profile.component';
+import { RouterModule } from '@angular/router';
+import { ProductDatailComponent } from './pages/product-datail/product-datail.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +36,16 @@ import { TokenInterceptor } from './interceptor/token/token.interceptor';
     NavComponent,
     ReversePipe,
     TimeAgoPipe,
-    HighLightDirective
+    HighLightDirective,
+    HomeComponent,
+    NotFoundComponent,
+    CategoryComponent,
+    MycartComponent,
+    LoginComponent,
+    RegisterComponent,
+    RecoveryComponent,
+    ProfileComponent,
+    ProductDatailComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +53,8 @@ import { TokenInterceptor } from './interceptor/token/token.interceptor';
     HttpClientModule,
     SwiperModule,
     FormsModule,
-    CommonModule
+    CommonModule,
+    RouterModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: TimeInterceptor, multi:true },

@@ -20,6 +20,7 @@ export class ProductComponent implements OnInit {
       name: ''
     }
   }
+  showDescription = false;
 
   @Output() addedProduct = new EventEmitter<Product>();// exportar al padre
   @Output() showProduct = new EventEmitter<string>();
