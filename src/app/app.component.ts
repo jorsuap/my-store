@@ -1,26 +1,40 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UsersService } from './services/users/users.service';
+
 import { FilesService } from './services/files/files.service';
+import { TokenService } from './services/token/token.service';
+import { AuthService } from './services/auth/auth.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
 
   currentProfile = {};
   imgRta = '';
 
   constructor(
     private userService: UsersService,
-    private filesService:FilesService
+    private filesService: FilesService,
+    private tokenService: TokenService,
+    private authService: AuthService
   ){}
+
+  ngOnInit(){
+   const token = this.tokenService.getToken();
+   if(token){
+    this.authService.getProfile()
+    .subscribe()
+   }
+  }
 
   createUser(){
     this.userService.create({
-      name: 'Nicolas',
-      email: 'Nicolas@Nicolas.com',
-      password: '12456'
+      name: 'Tomas',
+      email: 'tomas@tomas.com',
+      password: '12456',
+      role:'admin'
     })
     .subscribe(rta =>{
       console.log(rta)

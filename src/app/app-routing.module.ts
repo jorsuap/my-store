@@ -1,50 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { HomeComponent } from './pages/home/home.component';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { CategoryComponent } from './pages/category/category.component';
-import { MycartComponent } from './pages/mycart/mycart.component';
-import { LoginComponent } from './pages/login/login.component';
-import { RegisterComponent } from './pages/register/register.component';
-import { RecoveryComponent } from './pages/recovery/recovery.component';
-import { ProfileComponent } from './pages/profile/profile.component';
-import { RouterModule, Routes } from '@angular/router';
-import { ProductDatailComponent } from './pages/product-datail/product-datail.component';
-
-const routes: Routes =[
+import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { CustomPreloadService } from './services/custum-preload/custom-preload.service';
+import { QuicklinkStrategy  } from 'ngx-quicklink';
+import { AdminGuard } from './guards/admin.guard';
+const routes: Routes = [
   {
     path:'',
-    redirectTo:'/home',
-    pathMatch:'full'
+    loadChildren:()=>import('./website/website.module').then(m=>m.WebsiteModule),
+    data:{
+      preload:true,
+    }
   },
   {
-    path:'home',
-    component:HomeComponent
-  },
-  {
-    path:'category/:id',//recibe un parametro por url
-    component:CategoryComponent
-  },
-  {
-    path:'product/:id',//recibe un parametro por url
-    component:ProductDatailComponent
-  },
-  {
-    path:'my-cart',
-    component:MycartComponent
-  },
-  {
-    path:'login',
-    component:LoginComponent
-  },
-  {
-    path:'register',
-    component:RegisterComponent
-  },
-  {
-    path:'recovery',
-    component:RecoveryComponent
+    path:'cms',
+    canActivate:[AdminGuard],
+    loadChildren:()=>import('./cms/cms.module').then(m=>m.CmsModule),
   },
   {
     path:'**',
@@ -56,7 +28,9 @@ const routes: Routes =[
   declarations: [],
   imports: [
     CommonModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes,{
+      preloadingStrategy:QuicklinkStrategy
+    })
   ],
   exports: [RouterModule]
 })

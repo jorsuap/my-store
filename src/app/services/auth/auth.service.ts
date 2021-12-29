@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { CreaUsertDTO, User } from 'src/app/models/user.model';
 import { Auth } from 'src/app/models/auth.model';
-import { switchMap, tap} from 'rxjs';
+import { BehaviorSubject, switchMap, tap} from 'rxjs';
 import { TokenService } from '../token/token.service';
 
 
@@ -12,6 +12,8 @@ import { TokenService } from '../token/token.service';
 })
 export class AuthService {
   private apiUrl = `${environment.API_URL}/api/auth`;
+  private user = new BehaviorSubject<User|null>(null)//se usa el metodo Behaiviorsubjec para implementar el patron observable
+  user$ = this.user.asObservable(); //observable
 
   constructor(
     private http: HttpClient,
@@ -25,19 +27,20 @@ export class AuthService {
     )
   }
 
-  profile(){
-    // const headers = new HttpHeaders();
-    // headers.set('Authorization',  `Bearer ${token}`)
-    return this.http.get<User>(`${this.apiUrl}/profile`,{
-      // headers:{
-      //   Authorization: `Bearer ${token}`//debe tener un espacio
-      // }
-    })
+  getProfile(){
+    return this.http.get<User>(`${this.apiUrl}/profile`)
+    .pipe(
+      tap(user => this.user.next(user))
+    );
   }
   loginAndGet(email:string, password:string){
     return this.login(email,password)
     .pipe(
-      switchMap(() => this.profile())
+      switchMap(() => this.getProfile())
     )
+  }
+
+  logOut(){
+    this.tokenService.removeToken();
   }
 }
